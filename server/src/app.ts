@@ -5,6 +5,8 @@ import cors from 'cors';
 import config from 'config';
 import logger from './utils/logger';
 
+import socket from "./socket";
+
 const port = config.get<number>("port");
 const host = config.get<number>("host");
 const corsOrigin = config.get<string>("corsOrigin");
@@ -24,4 +26,5 @@ app.get("/", (_, response) => {
 
 httpServer.listen(port, host, () => {
   logger.info(`🚀 Server is listening at port ${port}`);
+  socket({io});
 });
