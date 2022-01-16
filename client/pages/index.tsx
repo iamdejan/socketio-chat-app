@@ -1,16 +1,18 @@
-import type { NextPage } from 'next';
 import { useSocket } from '../context/socket.context';
 
 import MessagesContainer from '../containers/MessagesContainer';
 import RoomsContainer from '../containers/RoomsContainer';
 import { useRef } from 'react';
 
+import styles from '../styles/Home.module.css';
+
 export default function Home(): JSX.Element {
+
   const {socket, username, setUsername} = useSocket();
   const usernameRef = useRef<HTMLInputElement>(null);
 
   function handleSetUsername() {
-    const value = usernameRef?.current?.value;
+    const value = usernameRef.current?.value;
     if(!value) {
       return;
     }
@@ -24,14 +26,20 @@ export default function Home(): JSX.Element {
     <div>
 
       {!username && (
-        <div>
-          <input placeholder="Username" ref={usernameRef} type="text" />
-          <button onClick={handleSetUsername}>Start</button>
+        <div className={styles.usernameWrapper}>
+          <div className={styles.usernameInner}>
+            <input placeholder="Username" ref={usernameRef} type="text" />
+            <button onClick={handleSetUsername}>Start</button>
+          </div>
         </div>
       )}
 
-      <RoomsContainer />
-      <MessagesContainer />
+      {username && (
+        <div className={styles.container}>
+          <RoomsContainer />
+          <MessagesContainer />
+        </div>
+      )}
     </div>
   );
 }
