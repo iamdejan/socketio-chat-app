@@ -1,7 +1,13 @@
-import logger from 'pino';
+import pino from 'pino';
 import dayjs from 'dayjs';
 
-const log = logger({
+const logger = pino({
+  transport: {
+    target: 'pino-pretty',
+    options: {
+      colorize: true
+    }
+  },
   prettifier: true,
   base: {
     pid: false
@@ -9,4 +15,4 @@ const log = logger({
   timestamp: () => `", time": "${dayjs().format()}"`
 });
 
-export default log;
+export default logger;

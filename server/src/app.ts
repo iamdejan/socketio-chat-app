@@ -23,5 +23,5 @@ app.get("/", (_, response) => {
 });
 
 httpServer.listen(port, host, () => {
-  logger.info(`Server is listening at port ${port}`);
+  logger.info(`🚀 Server is listening at port ${port}`);
 });
