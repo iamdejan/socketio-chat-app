@@ -33,7 +33,7 @@ function RoomsContainer(): JSX.Element {
 
       {Object.keys(rooms).map((key) => {
         return (
-          <div key={key}>{key}</div>
+          <div key={key}>{rooms[key]["name"]}</div>
         );
       })}
     </nav>
