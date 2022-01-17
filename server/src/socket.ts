@@ -6,7 +6,8 @@ const EVENTS = {
   connection: "connection",
   CLIENT: {
     create_room: "create_room",
-    send_message: "send_message"
+    send_message: "send_message",
+    join_room: "join_room"
   },
   SERVER: {
     room: "room",
@@ -17,9 +18,18 @@ const EVENTS = {
 
 type Room = {
   name: string;
-  messages: string[];
 }
 const rooms: Record<string, Room> = {};
+
+function emitToAll(socket: Socket, eventName: string, ...args: any[]): void {
+  socket.broadcast.emit(eventName, ...args);
+  socket.emit(eventName, ...args);
+}
+
+function joinRoom(socket: Socket, roomId: string) {
+  socket.join(roomId);
+  socket.emit(EVENTS.SERVER.joined_room, roomId);
+}
 
 function socket({io}: {io: Server}) {
   logger.info("Socket enabled");
@@ -32,16 +42,12 @@ function socket({io}: {io: Server}) {
 
       const roomId = nanoid();
 
-      rooms[roomId] = {name: roomName, messages: []};
+      rooms[roomId] = {name: roomName};
       logger.info(rooms);
 
-      socket.join(roomId);
+      emitToAll(socket, EVENTS.SERVER.room, rooms);
 
-      socket.broadcast.emit(EVENTS.SERVER.room, rooms);
-
-      socket.emit(EVENTS.SERVER.room, rooms);
-
-      socket.emit(EVENTS.SERVER.joined_room, roomId);
+      joinRoom(socket, roomId);
     });
 
     socket.on(EVENTS.CLIENT.send_message, ({roomId, message, username}) => {
@@ -51,6 +57,10 @@ function socket({io}: {io: Server}) {
         username,
         time: `${date.getHours()}:${date.getMinutes()}`
       });
+    });
+
+    socket.on(EVENTS.CLIENT.join_room, (roomId: string) => {
+      joinRoom(socket, roomId);
     });
   });
 }

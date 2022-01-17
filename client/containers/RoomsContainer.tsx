@@ -24,6 +24,14 @@ function RoomsContainer(): JSX.Element {
     inputElement.value = "";
   }
 
+  function handleJoinRoom(key: string) {
+    if(key === roomId) {
+      return;
+    }
+
+    socket.emit(EVENTS.CLIENT.join_room, key);
+  }
+
   return (
     <nav>
       <div>
@@ -33,7 +41,14 @@ function RoomsContainer(): JSX.Element {
 
       {Object.keys(rooms).map((key) => {
         return (
-          <div key={key}>{rooms[key]["name"]}</div>
+          <div key={key}>
+            <button disabled={key === roomId} title={`Join ${rooms[key].name}`} onClick={(event) => {
+              event.preventDefault();
+              handleJoinRoom(key);
+            }}>
+              {rooms[key].name}
+            </button>
+          </div>
         );
       })}
     </nav>

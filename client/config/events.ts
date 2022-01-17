@@ -2,7 +2,8 @@ const EVENTS = {
   connection: "connection",
   CLIENT: {
     create_room: "create_room",
-    send_message: "send_message"
+    send_message: "send_message",
+    join_room: "join_room"
   },
   SERVER: {
     room: "room",
