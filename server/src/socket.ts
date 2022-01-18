@@ -4,6 +4,7 @@ import logger from "./utils/logger";
 
 const EVENTS = {
   connection: "connection",
+  disconnect: "disconnect",
   CLIENT: {
     create_room: "create_room",
     send_message: "send_message",
@@ -36,6 +37,11 @@ function socket({io}: {io: Server}) {
 
   io.on(EVENTS.connection, (socket: Socket) => {
     logger.info(`User connected with id ${socket.id}`);
+    socket.emit(EVENTS.SERVER.room, rooms);
+
+    socket.on(EVENTS.disconnect, (reason) => {
+      logger.info(`User disconnected because of ${reason}`);
+    });
 
     socket.on(EVENTS.CLIENT.create_room, ({roomName}) => {
       logger.info(`Room created with name ${roomName}`);
