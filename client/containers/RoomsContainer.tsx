@@ -2,6 +2,8 @@ import { SyntheticEvent, useRef } from "react";
 import EVENTS from "../config/events";
 import { useSocket } from "../context/socket.context";
 
+import styles from '../styles/Rooms.module.css';
+
 function RoomsContainer(): JSX.Element {
 
   const {socket, roomId, rooms} = useSocket();
@@ -33,24 +35,26 @@ function RoomsContainer(): JSX.Element {
   }
 
   return (
-    <nav>
+    <nav className={styles.wrapper}>
       <div>
         <input ref={newRoomRef} placeholder="Room name" />
-        <button onClick={handleCreateRoom}>CREATE ROOM</button>
+        <button className="cta" onClick={handleCreateRoom}>CREATE ROOM</button>
       </div>
 
-      {Object.keys(rooms).map((key) => {
-        return (
-          <div key={key}>
-            <button disabled={key === roomId} title={`Join ${rooms[key].name}`} onClick={(event) => {
-              event.preventDefault();
-              handleJoinRoom(key);
-            }}>
-              {rooms[key].name}
-            </button>
-          </div>
-        );
-      })}
+      <ul className={styles.roomList}>
+        {Object.keys(rooms).map((key) => {
+          return (
+            <div key={key}>
+              <button className="cta" disabled={key === roomId} title={`Join ${rooms[key].name}`} onClick={(event) => {
+                event.preventDefault();
+                handleJoinRoom(key);
+              }}>
+                {rooms[key].name}
+              </button>
+            </div>
+          );
+        })}
+      </ul>
     </nav>
   );
 }

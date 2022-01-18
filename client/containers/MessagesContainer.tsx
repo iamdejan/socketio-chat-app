@@ -1,11 +1,14 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import EVENTS from "../config/events";
 import { useSocket } from "../context/socket.context";
+
+import styles from '../styles/Messages.module.css';
 
 function MessagesContainer(): JSX.Element {
 
   const {socket, roomId, username, messages, setMessages} = useSocket();
   const messageRef = useRef<HTMLTextAreaElement>(null);
+  const messageEndRef = useRef<HTMLDivElement>(null);
 
   function handleSendMessage(e: React.SyntheticEvent) {
     e.preventDefault();
@@ -30,6 +33,10 @@ function MessagesContainer(): JSX.Element {
     messageRef.current.value = "";
   }
 
+  useEffect(() => {
+    messageEndRef.current?.scrollIntoView({behavior: "smooth"});
+  }, [messages]);
+
   if(!roomId) {
     return (
       <div />
@@ -37,12 +44,23 @@ function MessagesContainer(): JSX.Element {
   }
 
   return (
-    <div>
-      {messages.map((message, index) => {
-        return <p key={index}><b>{message.username}</b>: {message.message}</p>
-      })}
+    <div className={styles.wrapper}>
+      <div className={styles.messageList}>
+        {messages.map(({message, username, time}, index) => {
+          return (
+            <div className={styles.message} key={index}> 
+              <div className={styles.messageInner}>
+                <span className={styles.messageSender}>{username} - {time}</span>
+                <span className={styles.messageBody}>{message}</span>
+              </div>
+            </div>
+          );
+        })}
 
-      <div>
+        <div ref={messageEndRef} />
+      </div>
+
+      <div className={styles.messageBox}>
         <textarea rows={1} ref={messageRef} placeholder="Type your message here" />
         <button onClick={handleSendMessage}>Send</button>
       </div>

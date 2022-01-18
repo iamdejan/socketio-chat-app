@@ -38,7 +38,7 @@ export default function Home(): JSX.Element {
         <div className={styles.usernameWrapper}>
           <div className={styles.usernameInner}>
             <input placeholder="Username" ref={usernameRef} type="text" />
-            <button onClick={handleSetUsername}>Start</button>
+            <button className="cta" onClick={handleSetUsername}>START</button>
           </div>
         </div>
       )}
