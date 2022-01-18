@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  client:
+    depends_on:
+      - server
+    build: ./client
+    environment:
+      - SOCKET_URL=http://server:4000
+    ports:
+      - 3000:3000
+  server:
+    build: ./server
+    ports:
+      - 4000:4000

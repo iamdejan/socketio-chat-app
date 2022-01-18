@@ -1,9 +1,10 @@
 {
     "name": "server",
     "version": "1.0.0",
-    "main": "index.js",
     "license": "MIT",
     "scripts": {
+        "build": "tsc --strict",
+        "start": "node dist/src/app.js",
         "dev": "nodemon --config nodemon.json src/app.ts"
     },
     "devDependencies": {

@@ -23,6 +23,7 @@ interface Context {
   setMessages: (messages: MessageDetail[]) => void;
 }
 
+console.log(`SOCKET_URL=${SOCKET_URL}`);
 const socket = io(SOCKET_URL, {
   transports: ["websocket"]
 });
