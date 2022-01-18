@@ -17,7 +17,8 @@ const io = new Server(httpServer, {
   cors: {
     origin: corsOrigin,
     credentials: true
-  }
+  },
+  transports: ["websocket"]
 });
 
 app.get("/", (_, response) => {

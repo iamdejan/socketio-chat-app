@@ -17,7 +17,7 @@ function RoomsContainer(): JSX.Element {
       return;
     }
 
-    socket.emit(EVENTS.CLIENT.create_room, {roomName});
+    socket.emit(EVENTS.CLIENT.create_room, {roomName, roomId});
 
     const inputElement = newRoomRef.current;
     if(inputElement === null || inputElement === undefined) {
@@ -31,7 +31,7 @@ function RoomsContainer(): JSX.Element {
       return;
     }
 
-    socket.emit(EVENTS.CLIENT.join_room, key);
+    socket.emit(EVENTS.CLIENT.join_room, key, roomId);
   }
 
   return (

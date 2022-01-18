@@ -27,9 +27,13 @@ function emitToAll(socket: Socket, eventName: string, ...args: any[]): void {
   socket.emit(eventName, ...args);
 }
 
-function joinRoom(socket: Socket, roomId: string) {
+function joinRoom(socket: Socket, roomId: string, previousRoomId?: string) {
+  if(previousRoomId) {
+    socket.leave(previousRoomId);
+  }
   socket.join(roomId);
   socket.emit(EVENTS.SERVER.joined_room, roomId);
+  logger.info(`${socket.id} => room ${roomId} joined`);
 }
 
 function socket({io}: {io: Server}) {
@@ -43,7 +47,7 @@ function socket({io}: {io: Server}) {
       logger.info(`User disconnected because of ${reason}`);
     });
 
-    socket.on(EVENTS.CLIENT.create_room, ({roomName}) => {
+    socket.on(EVENTS.CLIENT.create_room, ({roomName, previousRoomId}) => {
       logger.info(`Room created with name ${roomName}`);
 
       const roomId = nanoid();
@@ -53,7 +57,7 @@ function socket({io}: {io: Server}) {
 
       emitToAll(socket, EVENTS.SERVER.room, rooms);
 
-      joinRoom(socket, roomId);
+      joinRoom(socket, roomId, previousRoomId);
     });
 
     socket.on(EVENTS.CLIENT.send_message, ({roomId, message, username}) => {
@@ -65,8 +69,8 @@ function socket({io}: {io: Server}) {
       });
     });
 
-    socket.on(EVENTS.CLIENT.join_room, (roomId: string) => {
-      joinRoom(socket, roomId);
+    socket.on(EVENTS.CLIENT.join_room, (roomId: string, previousRoomId: string) => {
+      joinRoom(socket, roomId, previousRoomId);
     });
   });
 }
