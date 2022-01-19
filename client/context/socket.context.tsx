@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import io, { Socket } from "socket.io-client";
-import { SOCKET_URL } from "../config/default";
 import EVENTS from "../config/events";
 
 type MessageDetail = {
@@ -23,6 +22,7 @@ interface Context {
   setMessages: (messages: MessageDetail[]) => void;
 }
 
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:4000";
 console.log(`SOCKET_URL=${SOCKET_URL}`);
 const socket = io(SOCKET_URL, {
   transports: ["websocket"]
