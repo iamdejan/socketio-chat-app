@@ -46,27 +46,43 @@ function SocketProvider(props: any): JSX.Element {
     window.onfocus = function() {
       document.title = "Chat app";
     }
+
+    /**
+     * put listeners in useEffect, so that we don't create listeners per page render
+     * source:
+     * - https://dev.to/bravemaster619/how-to-use-socket-io-client-correctly-in-react-app-o65
+     * - https://dev.to/bravemaster619/how-to-prevent-multiple-socket-connections-and-events-in-react-531d
+     */
+    socket.on(EVENTS.SERVER.room, (value: Record<string, Room>) => {
+      console.log("Received event for rooms");
+
+      setRooms(value);
+    });
+
+    socket.on(EVENTS.SERVER.joined_room, (roomId: string) => {
+      console.log(`Received event for joined_room with room id ${roomId}`);
+
+      setRoomId(roomId);
+      setMessages([]);
+    });
+
+    socket.on(EVENTS.SERVER.room_message, (messageDetail: MessageDetail) => {
+      if(!document.hasFocus()) {
+        document.title = "New message...";
+      }
+
+      setMessages([
+        ...messages,
+        messageDetail
+      ]);
+    });
+
+    return () => {
+      socket.off(EVENTS.SERVER.room);
+      socket.off(EVENTS.SERVER.joined_room);
+      socket.off(EVENTS.SERVER.room_message);
+    };
   }, []);
-
-  socket.on(EVENTS.SERVER.room, (value: Record<string, Room>) => {
-    setRooms(value);
-  });
-
-  socket.on(EVENTS.SERVER.joined_room, (roomId: string) => {
-    setRoomId(roomId);
-    setMessages([]);
-  });
-
-  socket.on(EVENTS.SERVER.room_message, (messageDetail: MessageDetail) => {
-    if(!document.hasFocus()) {
-      document.title = "New message...";
-    }
-
-    setMessages([
-      ...messages,
-      messageDetail
-    ]);
-  });
 
   return (
     <SocketContext.Provider value={{socket, username, setUsername, roomId, rooms, messages, setMessages}} {...props} />
