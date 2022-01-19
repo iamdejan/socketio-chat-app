@@ -33,7 +33,7 @@ function joinRoom(socket: Socket, roomId: string, previousRoomId?: string) {
   }
   socket.join(roomId);
   socket.emit(EVENTS.SERVER.joined_room, roomId);
-  logger.info(`${socket.id} => room ${roomId} joined`);
+  logger.info(`user ${socket.id} joins room ${roomId}`);
 }
 
 function socket({io}: {io: Server}) {
