@@ -4,12 +4,12 @@ services:
   client:
     depends_on:
       - server
-    build: ./client
+    image: dejan1998/socketio-chat-app-client
     environment:
       - SOCKET_URL=http://server:4000
     ports:
       - 3000:3000
   server:
-    build: ./server
+    image: dejan1998/socketio-chat-app-server
     ports:
       - 4000:4000
