@@ -5,8 +5,6 @@ services:
     depends_on:
       - server
     image: dejan1998/socketio-chat-app-client
-    environment:
-      - SOCKET_URL=http://server:4000
     ports:
       - 3000:3000
   server:

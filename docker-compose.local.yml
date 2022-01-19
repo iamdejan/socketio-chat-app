@@ -1,0 +1,6 @@
+version: '3.8'
+
+services:
+  client:
+    environment:
+      - NEXT_PUBLIC_SOCKET_URL=http://localhost:4000
