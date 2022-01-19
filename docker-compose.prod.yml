@@ -3,4 +3,4 @@ version: '3.8'
 services:
   client:
     environment:
-      - NEXT_PUBLIC_SOCKET_URL=$(ip -4 addr show eth0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}'):4000
+      - NEXT_PUBLIC_SOCKET_URL=$$(ip -4 addr show eth0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}'):4000
