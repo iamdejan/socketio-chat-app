@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "license": "MIT",
     "scripts": {
+        "lint": "eslint . --ext .ts",
         "build": "tsc --strict",
         "start": "node dist/src/app.js",
         "dev": "nodemon --config nodemon.json src/app.ts"
