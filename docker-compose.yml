@@ -1,13 +1,20 @@
 version: '3.8'
 
+x-server: &x-server
+  depends_on:
+    - redis
+  ports:
+    - 4000:4000
+
 services:
   client:
     depends_on:
       - server
-    image: dejan1998/socketio-chat-app-client
     ports:
       - 3000:3000
   server:
-    image: dejan1998/socketio-chat-app-server
+    <<: *x-server
+  redis:
+    image: redis:6.2.6-bullseye
     ports:
-      - 4000:4000
+      - 6379:6379

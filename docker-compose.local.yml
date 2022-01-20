@@ -1,6 +1,12 @@
 version: '3.8'
 
+x-server: &x-server
+  build: ./server
+
 services:
   client:
+    build: ./client
     environment:
       - NEXT_PUBLIC_SOCKET_URL=http://localhost:4000
+  server:
+    <<: *x-server
