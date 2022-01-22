@@ -23,8 +23,8 @@ type Room = {
 }
 const rooms: Record<string, Room> = {}; // TODO dejan (MongoDB): store in MongoDB
 
-function emitToAll(socket: Socket, eventName: string, ...args: any[]): void {
-  //TODO dejan: use Redis pub-sub to broadcast to all clients
+function emitToAll(socket: Socket, eventName: string, ...args: unknown[]): void {
+  //TODO dejan (Redis): use Redis pub-sub to broadcast to all clients
   // who joined the same room but scattered across servers
   socket.broadcast.emit(eventName, ...args);
   socket.emit(eventName, ...args);

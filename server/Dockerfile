@@ -1,9 +1,13 @@
 FROM node:16.13.2-bullseye-slim
 
 WORKDIR /app
-COPY . .
 
-RUN yarn install && yarn build
+COPY package.json yarn.lock ./
+
+RUN yarn install --frozen-lockfile
+
+COPY . .
+RUN yarn lint && yarn build
 
 EXPOSE 4000
 CMD ["yarn", "start"]
