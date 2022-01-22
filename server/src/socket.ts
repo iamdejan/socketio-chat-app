@@ -19,10 +19,13 @@ const EVENTS = {
 
 type Room = {
   name: string;
+  messages: string[];
 }
-const rooms: Record<string, Room> = {};
+const rooms: Record<string, Room> = {}; // TODO dejan (MongoDB): store in MongoDB
 
 function emitToAll(socket: Socket, eventName: string, ...args: any[]): void {
+  //TODO dejan: use Redis pub-sub to broadcast to all clients
+  // who joined the same room but scattered across servers
   socket.broadcast.emit(eventName, ...args);
   socket.emit(eventName, ...args);
 }
@@ -32,15 +35,24 @@ function joinRoom(socket: Socket, roomId: string, previousRoomId?: string) {
     socket.leave(previousRoomId);
   }
   socket.join(roomId);
+
+  // TODO dejan (MongoDB): retrieve from MongoDB
   socket.emit(EVENTS.SERVER.joined_room, roomId);
   logger.info(`user ${socket.id} joins room ${roomId}`);
 }
 
-function socket({io}: {io: Server}) {
+function socket(io: Server) {
   logger.info("Socket enabled");
 
+  /**
+   * when user is connected, user is connected only to 1 of many servers
+   * therefore, it is important to store the room and messages in MongoDB
+   * also, when broadcast, broadcast to all servers using Redis pub-sub
+   */ 
   io.on(EVENTS.connection, (socket: Socket) => {
     logger.info(`User connected with id ${socket.id}`);
+
+    // TODO dejan (MongoDB): get list of rooms from MongoDB
     socket.emit(EVENTS.SERVER.room, rooms);
 
     socket.on(EVENTS.disconnect, (reason) => {
@@ -51,9 +63,7 @@ function socket({io}: {io: Server}) {
       logger.info(`Room created with name ${roomName}`);
 
       const roomId = nanoid();
-
-      rooms[roomId] = {name: roomName};
-      logger.info(rooms);
+      rooms[roomId] = {name: roomName, messages: []};
 
       emitToAll(socket, EVENTS.SERVER.room, rooms);
 
@@ -62,6 +72,7 @@ function socket({io}: {io: Server}) {
 
     socket.on(EVENTS.CLIENT.send_message, ({roomId, message, username}) => {
       const date = new Date();
+      // TODO dejan (MongoDB): store message in MongoDB
       socket.to(roomId).emit(EVENTS.SERVER.room_message, {
         message,
         username,
