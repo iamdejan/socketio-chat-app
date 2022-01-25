@@ -54,16 +54,16 @@ function SocketProvider(props: any): JSX.Element {
      * - https://dev.to/bravemaster619/how-to-prevent-multiple-socket-connections-and-events-in-react-531d
      */
     socket.on(EVENTS.SERVER.room, (value: Record<string, Room>) => {
-      console.log("Received event for rooms");
-
       setRooms(value);
     });
 
-    socket.on(EVENTS.SERVER.joined_room, (roomId: string) => {
+    socket.on(EVENTS.SERVER.joined_room, (roomId: string, messages: MessageDetail[]) => {
       console.log(`Received event for joined_room with room id ${roomId}`);
 
       setRoomId(roomId);
-      setMessages([]);
+      console.log(`existing messages for room ${roomId} = ${messages}`);
+
+      setMessages(messages);
     });
 
     socket.on(EVENTS.SERVER.room_message, (messageDetail: MessageDetail) => {
@@ -71,6 +71,7 @@ function SocketProvider(props: any): JSX.Element {
         document.title = "New message...";
       }
 
+      console.log(`existing messages: ${JSON.stringify(messages)}`);
       setMessages([
         ...messages,
         messageDetail

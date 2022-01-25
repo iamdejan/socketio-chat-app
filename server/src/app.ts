@@ -5,6 +5,14 @@ import config from 'config';
 import logger from './utils/logger';
 
 import socket from "./socket";
+import mongoose from "mongoose";
+
+mongoose.connect(
+  `mongodb+srv://test:test@socketio-chat-app.0deyc.mongodb.net/${process.env.COLLECTION_NAME}?retryWrites=true&w=majority`,
+  () => {
+    logger.info("Connected to database");
+  }
+);
 
 const port = config.get<number>("port");
 const host = config.get<number>("host");

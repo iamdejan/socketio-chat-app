@@ -1,6 +1,9 @@
 import { nanoid } from "nanoid";
 import {Server, Socket} from "socket.io";
+import Room from "./types/Room";
 import logger from "./utils/logger";
+import RoomSchema from "./models/RoomSchema";
+import MessageDetail from "./types/MessageDetail";
 
 const EVENTS = {
   connection: "connection",
@@ -17,12 +20,6 @@ const EVENTS = {
   }
 };
 
-type Room = {
-  name: string;
-  messages: string[];
-}
-const rooms: Record<string, Room> = {}; // TODO dejan (MongoDB): store in MongoDB
-
 function emitToAll(socket: Socket, eventName: string, ...args: unknown[]): void {
   //TODO dejan (Redis): use Redis pub-sub to broadcast to all clients
   // who joined the same room but scattered across servers
@@ -30,15 +27,30 @@ function emitToAll(socket: Socket, eventName: string, ...args: unknown[]): void 
   socket.emit(eventName, ...args);
 }
 
-function joinRoom(socket: Socket, roomId: string, previousRoomId?: string) {
+async function joinRoom(socket: Socket, roomId: string, previousRoomId?: string) {
   if(previousRoomId) {
     socket.leave(previousRoomId);
   }
   socket.join(roomId);
 
-  // TODO dejan (MongoDB): retrieve from MongoDB
-  socket.emit(EVENTS.SERVER.joined_room, roomId);
+  const room = await RoomSchema.findOne({roomId}, {messages: 1});
+  if(!room) {
+    return;
+  }
+  const messages = room.messages;
+  logger.info(`messages for room ${roomId} = ${JSON.stringify(messages)}`);
+  socket.emit(EVENTS.SERVER.joined_room, roomId, messages);
   logger.info(`user ${socket.id} joins room ${roomId}`);
+}
+
+async function getRooms(): Promise<Record<string, Room>> {
+  const rooms = await RoomSchema.find({}, {messages: 0});
+  
+  const record: Record<string, Room> = {};
+  for(const room of rooms) {
+    record[room.roomId] = {roomId: room.roomId, name: room.name, messages: []};
+  }
+  return Promise.resolve(record);
 }
 
 function socket(io: Server) {
@@ -52,8 +64,9 @@ function socket(io: Server) {
   io.on(EVENTS.connection, (socket: Socket) => {
     logger.info(`User connected with id ${socket.id}`);
 
-    // TODO dejan (MongoDB): get list of rooms from MongoDB
-    socket.emit(EVENTS.SERVER.room, rooms);
+    getRooms().then(rooms => {
+      socket.emit(EVENTS.SERVER.room, rooms);
+    })
 
     socket.on(EVENTS.disconnect, (reason) => {
       logger.info(`User disconnected because of ${reason}`);
@@ -63,21 +76,33 @@ function socket(io: Server) {
       logger.info(`Room created with name ${roomName}`);
 
       const roomId = nanoid();
-      rooms[roomId] = {name: roomName, messages: []};
-
-      emitToAll(socket, EVENTS.SERVER.room, rooms);
-
-      joinRoom(socket, roomId, previousRoomId);
+      const newRoom: Room = {roomId, name: roomName, messages: []};
+      RoomSchema.build(newRoom).save()
+        .then(() => getRooms())
+        .then(rooms => {
+          emitToAll(socket, EVENTS.SERVER.room, rooms);
+          joinRoom(socket, roomId, previousRoomId);
+        });
     });
 
     socket.on(EVENTS.CLIENT.send_message, ({roomId, message, username}) => {
       const date = new Date();
-      // TODO dejan (MongoDB): store message in MongoDB
-      socket.to(roomId).emit(EVENTS.SERVER.room_message, {
-        message,
-        username,
-        time: `${date.getHours()}:${date.getMinutes()}`
-      });
+      RoomSchema.findOne({roomId})
+        .then(room => {
+          if(!room) {
+            return;
+          }
+
+          const newMessage: MessageDetail = {
+            message,
+            username,
+            time: `${date.getHours()}:${date.getMinutes()}`
+          };
+          RoomSchema.updateOne({roomId}, {messages: [...room.messages, newMessage]})
+            .then(() => {
+              socket.to(roomId).emit(EVENTS.SERVER.room_message, newMessage);
+            });
+        });
     });
 
     socket.on(EVENTS.CLIENT.join_room, (roomId: string, previousRoomId: string) => {
