@@ -4,6 +4,7 @@ import Room from "./types/Room";
 import logger from "./utils/logger";
 import RoomSchema from "./models/RoomSchema";
 import MessageDetail from "./types/MessageDetail";
+import { serialize } from "class-transformer";
 
 const EVENTS = {
   connection: "connection",
@@ -24,6 +25,7 @@ function emitToAll(socket: Socket, eventName: string, ...args: unknown[]): void 
   //TODO dejan (Redis): use Redis pub-sub to broadcast to all clients
   // who joined the same room but scattered across servers
   socket.broadcast.emit(eventName, ...args);
+
   socket.emit(eventName, ...args);
 }
 
@@ -38,8 +40,7 @@ async function joinRoom(socket: Socket, roomId: string, previousRoomId?: string)
     return;
   }
   const messages = room.messages;
-  logger.info(`messages for room ${roomId} = ${JSON.stringify(messages)}`);
-  socket.emit(EVENTS.SERVER.joined_room, roomId, messages);
+  socket.emit(EVENTS.SERVER.joined_room, roomId, serialize(messages));
   logger.info(`user ${socket.id} joins room ${roomId}`);
 }
 
@@ -100,7 +101,7 @@ function socket(io: Server) {
           };
           RoomSchema.updateOne({roomId}, {messages: [...room.messages, newMessage]})
             .then(() => {
-              socket.to(roomId).emit(EVENTS.SERVER.room_message, newMessage);
+              socket.to(roomId).emit(EVENTS.SERVER.room_message, serialize(newMessage));
             });
         });
     });
