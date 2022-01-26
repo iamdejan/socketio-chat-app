@@ -63,8 +63,7 @@ function SocketProvider(props: any): JSX.Element {
 
       setRoomId(roomId);
 
-      const messages = deserializeArray(MessageDetail, messagesString);
-      setMessages(messages);
+      setMessages(deserializeArray(MessageDetail, messagesString));
     });
 
     socket.on(EVENTS.SERVER.room_message, (messageDetailStr: string) => {
