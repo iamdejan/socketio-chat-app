@@ -3,6 +3,9 @@ version: '3.8'
 x-server: &x-server
   depends_on:
     - redis
+  environment:
+    - MONGODB_USER=test
+    - MONGODB_PASS=test
 
 services:
   proxy:

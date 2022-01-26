@@ -5,6 +5,7 @@ import logger from "./utils/logger";
 import RoomSchema from "./models/RoomSchema";
 import MessageDetail from "./types/MessageDetail";
 import { serialize } from "class-transformer";
+import { backOff } from "exponential-backoff";
 
 const EVENTS = {
   connection: "connection",
@@ -22,8 +23,6 @@ const EVENTS = {
 };
 
 function emitToAll(socket: Socket, eventName: string, ...args: unknown[]): void {
-  //TODO dejan (Redis): use Redis pub-sub to broadcast to all clients
-  // who joined the same room but scattered across servers
   socket.broadcast.emit(eventName, ...args);
 
   socket.emit(eventName, ...args);
@@ -45,13 +44,20 @@ async function joinRoom(socket: Socket, roomId: string, previousRoomId?: string)
 }
 
 async function getRooms(): Promise<Record<string, Room>> {
-  const rooms = await RoomSchema.find({}, {messages: 0});
-  
-  const record: Record<string, Room> = {};
-  for(const room of rooms) {
-    record[room.roomId] = {roomId: room.roomId, name: room.name, messages: []};
-  }
-  return Promise.resolve(record);
+  return backOff(async () => {
+    logger.info(`Getting rooms with collection name ${process.env.COLLECTION_NAME}...`);
+    const rooms = await RoomSchema.find({}, {messages: 0});
+    logger.info(`Finished getting rooms`);
+
+    const record: Record<string, Room> = {};
+    for(const room of rooms) {
+      record[room.roomId] = {roomId: room.roomId, name: room.name, messages: []};
+    }
+    logger.info(`record = ${serialize(record)}`);
+    return Promise.resolve(record);
+  }, {
+    numOfAttempts: 20
+  });
 }
 
 function socket(io: Server) {
@@ -61,20 +67,24 @@ function socket(io: Server) {
    * when user is connected, user is connected only to 1 of many servers
    * therefore, it is important to store the room and messages in MongoDB
    * also, when broadcast, broadcast to all servers using Redis pub-sub
-   */ 
+   */
   io.on(EVENTS.connection, (socket: Socket) => {
     logger.info(`User connected with id ${socket.id}`);
 
-    getRooms().then(rooms => {
-      socket.emit(EVENTS.SERVER.room, rooms);
-    })
+    getRooms()
+      .then(rooms => {
+        socket.emit(EVENTS.SERVER.room, rooms);
+      })
+      .catch((reason: string) => {
+        logger.info(`Failed to query list of rooms because of ${reason}`);
+      });
 
     socket.on(EVENTS.disconnect, (reason) => {
       logger.info(`User disconnected because of ${reason}`);
     });
 
     socket.on(EVENTS.CLIENT.create_room, ({roomName, previousRoomId}) => {
-      logger.info(`Room created with name ${roomName}`);
+      logger.info(`Creating room with name ${roomName}...`);
 
       const roomId = nanoid();
       const newRoom: Room = {roomId, name: roomName, messages: []};
@@ -83,6 +93,7 @@ function socket(io: Server) {
         .then(rooms => {
           emitToAll(socket, EVENTS.SERVER.room, rooms);
           joinRoom(socket, roomId, previousRoomId);
+          logger.info(`Room created with name ${roomName}...`);
         });
     });
 

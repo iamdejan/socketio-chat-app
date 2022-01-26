@@ -1,8 +1,8 @@
 version: '3.8'
 
-x-server: &x-server
+x-server-local: &x-server-local
   environment:
-    COLLECTION_NAME=dev
+    - COLLECTION_NAME=dev
   build:
     ./server
 
@@ -14,8 +14,8 @@ services:
   proxy:
     build: ./haproxy
   server1:
-    <<: &x-server
+    <<: *x-server-local
   server2:
-    <<: &x-server
+    <<: *x-server-local
   server3:
-    <<: &x-server
+    <<: *x-server-local
