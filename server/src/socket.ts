@@ -66,7 +66,7 @@ function socket(io: Server) {
   /**
    * when user is connected, user is connected only to 1 of many servers
    * therefore, it is important to store the room and messages in MongoDB
-   * also, when broadcast, broadcast to all servers using Redis pub-sub
+   * also, when broadcast, we use Redis adapter
    */
   io.on(EVENTS.connection, (socket: Socket) => {
     logger.info(`User connected with id ${socket.id}`);
@@ -93,7 +93,7 @@ function socket(io: Server) {
         .then(rooms => {
           emitToAll(socket, EVENTS.SERVER.room, rooms);
           joinRoom(socket, roomId, previousRoomId);
-          logger.info(`Room created with name ${roomName}...`);
+          logger.info(`Room created with name ${roomName}`);
         });
     });
 
