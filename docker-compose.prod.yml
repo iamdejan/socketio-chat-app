@@ -1,9 +1,23 @@
 version: '3.8'
 
+x-server-prod: &x-server-prod
+  image: dejan1998/socketio-chat-app-server
+  environment:
+    - COLLECTION_NAME=prod
+
 services:
+  proxy:
+    image: dejan1998/socketio-chat-app-proxy
   client:
+    image: dejan1998/socketio-chat-app-client
     environment:
       - NEXT_PUBLIC_SOCKET_URL=139.177.186.174:4000
+  server1:
+    <<: *x-server-prod
+  server2:
+    <<: *x-server-prod
+  server3:
+    <<: *x-server-prod
 
 # How to get IP Address:
 # $ ip -4 addr show eth0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}'

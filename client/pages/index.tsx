@@ -8,7 +8,7 @@ import styles from '../styles/Home.module.css';
 
 export default function Home(): JSX.Element {
 
-  const {socket, username, setUsername} = useSocket();
+  const {username, setUsername} = useSocket();
   const usernameRef = useRef<HTMLInputElement>(null);
 
   function handleSetUsername() {

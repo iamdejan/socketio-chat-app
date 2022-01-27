@@ -1,13 +1,32 @@
 version: '3.8'
 
+x-server: &x-server
+  depends_on:
+    - redis
+  environment:
+    - MONGODB_USER=test
+    - MONGODB_PASS=test
+
 services:
-  client:
+  proxy:
     depends_on:
-      - server
-    image: dejan1998/socketio-chat-app-client
-    ports:
-      - 3000:3000
-  server:
-    image: dejan1998/socketio-chat-app-server
+      - server1
+      - server2
+      - server3
     ports:
       - 4000:4000
+  server1:
+    <<: *x-server
+  server2:
+    <<: *x-server
+  server3:
+    <<: *x-server
+  client:
+    depends_on:
+      - proxy
+    ports:
+      - 3000:3000
+  redis:
+    image: redis:6.2.6-bullseye
+    ports:
+      - 6379:6379

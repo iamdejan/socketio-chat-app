@@ -1,11 +1,12 @@
+import { deserialize, deserializeArray } from "class-transformer";
 import { createContext, useContext, useEffect, useState } from "react";
 import io, { Socket } from "socket.io-client";
 import EVENTS from "../config/events";
 
-type MessageDetail = {
-  message: string;
-  username: string;
-  time: string
+class MessageDetail {
+  public message = "";
+  public username = "";
+  public time = ""
 }
 
 type Room = {
@@ -54,23 +55,23 @@ function SocketProvider(props: any): JSX.Element {
      * - https://dev.to/bravemaster619/how-to-prevent-multiple-socket-connections-and-events-in-react-531d
      */
     socket.on(EVENTS.SERVER.room, (value: Record<string, Room>) => {
-      console.log("Received event for rooms");
-
       setRooms(value);
     });
 
-    socket.on(EVENTS.SERVER.joined_room, (roomId: string) => {
+    socket.on(EVENTS.SERVER.joined_room, (roomId: string, messagesString: string) => {
       console.log(`Received event for joined_room with room id ${roomId}`);
 
       setRoomId(roomId);
-      setMessages([]);
+
+      setMessages(deserializeArray(MessageDetail, messagesString));
     });
 
-    socket.on(EVENTS.SERVER.room_message, (messageDetail: MessageDetail) => {
+    socket.on(EVENTS.SERVER.room_message, (messageDetailStr: string) => {
       if(!document.hasFocus()) {
         document.title = "New message...";
       }
 
+      const messageDetail = deserialize(MessageDetail, messageDetailStr);
       setMessages([
         ...messages,
         messageDetail
@@ -82,7 +83,7 @@ function SocketProvider(props: any): JSX.Element {
       socket.off(EVENTS.SERVER.joined_room);
       socket.off(EVENTS.SERVER.room_message);
     };
-  }, []);
+  }, [messages]);
 
   return (
     <SocketContext.Provider value={{socket, username, setUsername, roomId, rooms, messages, setMessages}} {...props} />
