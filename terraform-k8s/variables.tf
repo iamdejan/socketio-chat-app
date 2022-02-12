@@ -1,5 +1,6 @@
 variable "project_id" {
   description = "GCP Project ID in which infrastructure will be provisioned."
+  default = "socket-io-chat-app-340411"
 }
 
 variable "network_name" {

@@ -8,7 +8,7 @@ terraform {
 
 provider "google" {
   project = var.project_id
-  region = "asia-southeast2"
+  region = var.region
 }
 
 module "gcp_network" {

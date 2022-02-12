@@ -2,7 +2,6 @@
 
 @startuml
 
-' skinparam linetype ortho
 skinparam shadowing false
 hide empty fields
 hide empty methods
