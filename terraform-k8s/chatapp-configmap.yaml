@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chatapp-configmap
+data:
+  collection-name: prod
+  redis-url: redis-server
