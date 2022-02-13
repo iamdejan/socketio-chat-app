@@ -15,7 +15,33 @@ spec:
         app: server
     spec:
       containers:
-      - name: server
-        image: dejan1998/socketio-chat-app-server
-        ports:
-        - containerPort: 4000
+        - name: server
+          image: dejan1998/socketio-chat-app-server
+          ports:
+            - containerPort: 4000
+          env:
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: chatapp-configmap
+                  key: redis-url
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: chatapp-configmap
+                  key: redis-port
+            - name: COLLECTION_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: chatapp-configmap
+                  key: collection-name
+            - name: MONGODB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: chatapp-mongo-secret
+                  key: username
+            - name: MONGODB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: chatapp-mongo-secret
+                  key: password

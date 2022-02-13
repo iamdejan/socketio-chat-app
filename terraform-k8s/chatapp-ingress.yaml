@@ -3,4 +3,6 @@ kind: Ingress
 metadata:
   name: chatapp-ingress
   annotations:
-    kubernetes.io/ingress.class: 'nginx'
+    cloud.google.com/load-balancer-type: "External"
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: # TODO dejan: create global static IP address on Terraform

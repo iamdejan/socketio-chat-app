@@ -29,7 +29,12 @@ const io = new Server(httpServer, {
   transports: ["websocket"]
 });
 
-const pubClient = new Redis(6379, "redis");
+const redisHost = process.env.REDIS_HOST || "redis";
+const redisPort = process.env.REDIS_PORT? Number.parseInt(process.env.REDIS_PORT) : 6379;
+const pubClient = new Redis(redisPort, redisHost);
+pubClient.on("error", err => {
+  console.log(`Error connecting to Redis because of ${err}`);
+});
 const subClient = pubClient.duplicate();
 
 app.get("/", (_, response) => {

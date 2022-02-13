@@ -4,4 +4,5 @@ metadata:
   name: chatapp-configmap
 data:
   collection-name: prod
-  redis-url: redis-server
+  redis-url: redis-service
+  redis-port: '6379'
