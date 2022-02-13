@@ -60,4 +60,4 @@ spec:
   selector:
     app: server
   type: LoadBalancer
-  loadBalancerIP: # TODO dejan: reserver IP Address, then put the address here.
+  loadBalancerIP: # TODO dejan: reserve IP Address, then put the address here.
