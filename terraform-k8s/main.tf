@@ -62,3 +62,13 @@ module "gke" {
     }
   ]
 }
+
+module "address" {
+  source       = "terraform-google-modules/address/google"
+  project_id   = var.project_id
+  region       = var.region
+  address_type = "EXTERNAL"
+  names = [
+    "load-balancer-ip-address",
+  ]
+}
