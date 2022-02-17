@@ -53,11 +53,10 @@ metadata:
     app: server
   name: server-service
 spec:
+  type: ClusterIP
+  selector:
+    app: server
   ports:
   - port: 4000
     protocol: TCP
     targetPort: 4000
-  selector:
-    app: server
-  type: LoadBalancer
-  loadBalancerIP: '34.82.161.222'

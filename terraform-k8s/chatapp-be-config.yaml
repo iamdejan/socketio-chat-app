@@ -1,0 +1,10 @@
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: chatapp-be-config
+spec:
+  sessionAffinity:
+    affinityType: "CLIENT_IP"
+  timeoutSec: 300
+  connectionDraining:
+    drainingTimeoutSec: 600
