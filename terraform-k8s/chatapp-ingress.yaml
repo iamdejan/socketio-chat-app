@@ -4,7 +4,7 @@ metadata:
   name: chatapp-ingress
   annotations:
     cloud.google.com/backend-config: chatapp-be-config
-    kubernetes.io/ingress.global-static-ip-name: helloweb-ip
+    kubernetes.io/ingress.global-static-ip-name: load-balancer-ip-address
 spec:
   rules:
   - http:
