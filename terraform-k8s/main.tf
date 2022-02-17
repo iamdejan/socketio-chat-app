@@ -67,5 +67,5 @@ resource "google_compute_global_address" "default" {
   project      = var.project_id
   name         = "load-balancer-ip-address"
   address_type = "EXTERNAL"
-  ip_version   = "IPV6"
+  ip_version   = "IPV4"
 }
