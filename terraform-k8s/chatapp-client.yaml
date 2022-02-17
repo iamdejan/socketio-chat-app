@@ -21,4 +21,16 @@ spec:
             - containerPort: 3000
           env:
             - name: NEXT_PUBLIC_SOCKET_URL
-              value: # TODO dejan: determine proper IP Address for BE
+              value: '34.82.161.222'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: client-service
+spec:
+  selector:
+    app: client
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
