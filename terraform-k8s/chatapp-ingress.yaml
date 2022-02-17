@@ -10,14 +10,14 @@ spec:
   - http:
       paths:
       - path: /client
-        pathType: ImplementationSpecific
+        pathType: Exact
         backend:
           service:
             name: client-service
             port:
               number: 3000
       - path: /server
-        pathType: ImplementationSpecific
+        pathType: Exact
         backend:
           service:
             name: server-service
