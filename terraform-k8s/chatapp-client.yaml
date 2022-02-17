@@ -29,6 +29,7 @@ metadata:
   name: client-service
 spec:
   type: LoadBalancer
+  loadBalancerIP: '34.82.161.222'
   selector:
     app: client
   ports:
