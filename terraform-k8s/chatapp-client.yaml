@@ -21,7 +21,7 @@ spec:
             - containerPort: 3000
           env:
             - name: NEXT_PUBLIC_SOCKET_URL
-              value: '34.82.161.222'
+              value: '34.120.172.25'
 ---
 apiVersion: v1
 kind: Service
