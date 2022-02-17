@@ -28,6 +28,7 @@ kind: Service
 metadata:
   name: client-service
 spec:
+  type: LoadBalancer
   selector:
     app: client
   ports:
