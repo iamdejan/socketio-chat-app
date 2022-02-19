@@ -63,9 +63,19 @@ module "gke" {
   ]
 }
 
+module "address" {
+  source       = "terraform-google-modules/address/google"
+  project_id   = var.project_id
+  region       = var.region
+  address_type = "EXTERNAL"
+  names = [
+    "client-ip-address"
+  ]
+}
+
 resource "google_compute_global_address" "default" {
   project      = var.project_id
-  name         = "load-balancer-ip-address"
+  name         = "server-ip-address"
   address_type = "EXTERNAL"
   ip_version   = "IPV4"
 }
