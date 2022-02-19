@@ -7,46 +7,57 @@ hide empty fields
 hide empty methods
 hide circle
 
-class Internet
+class Browser
 
 component "K8s Cluster" {
     class Secret
     class ConfigMap
-    class Nginx <<ingress>>
+    class Ingress <<ingress>>
 
     component Redis {
         class RedisService <<service>> {
             type = ClusterIP
         }
-        class RedisBE <<deployment>> {
+        class Redis <<deployment>> {
             pod = 1
         }
 
-        RedisService <--> RedisBE
+        RedisService <--> Redis
     }
 
-    component Chat {
-        class ChatService <<service>> {
+    component "Chat BE" {
+        class ServerService <<service>> {
             type = ClusterIP
         }
-        class ChatBE <<deployment>> {
+        class Server <<deployment>> {
             pod = 3
         }
 
-        ChatService --> ChatBE
+        ServerService --> ChatBE
     }
 
-    ChatBE --> ConfigMap: retrieve DB URL
-    RedisService <-> ChatBE: communicate between pods
-    ChatBE --> Secret: retrieve database creds
+    component "Chat FE" {
+        class Client <<deployment>> {
+            pod = 1
+        }
 
-    Internet --> Nginx
-    Nginx --> ChatService: redirect request to service
+        class ClientService <<service>> {
+            type = LoadBalancer
+        }
+    }
+
+    Server --> ConfigMap: retrieve DB URL
+    RedisService <--> Server: communicate between pods
+    Server --> Secret: retrieve database creds
+
+    "Chat FE" <--> Browser: open web page
+    Browser --> Ingress
+    Ingress --> ServerService: redirect request to service
 }
 
 component "3rd party" {
     class MongoDB {}
-    ChatBE --> MongoDB: store chats
+    ChatBE --> MongoDB: store chat messages
 }
 
 @enduml
