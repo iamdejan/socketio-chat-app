@@ -33,7 +33,7 @@ component "K8s Cluster" {
             pod = 3
         }
 
-        ServerService --> ChatBE
+        ServerService --> Server
     }
 
     component "Chat FE" {
@@ -44,20 +44,22 @@ component "K8s Cluster" {
         class ClientService <<service>> {
             type = LoadBalancer
         }
+
+        ClientService --> Client
     }
 
     Server --> ConfigMap: retrieve DB URL
     RedisService <--> Server: communicate between pods
     Server --> Secret: retrieve database creds
 
-    "Chat FE" <--> Browser: open web page
+    ClientService <--> Browser: open web page
     Browser --> Ingress
     Ingress --> ServerService: redirect request to service
 }
 
 component "3rd party" {
     class MongoDB {}
-    ChatBE --> MongoDB: store chat messages
+    Server ---> MongoDB: store chat messages
 }
 
 @enduml
