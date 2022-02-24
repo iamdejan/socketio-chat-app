@@ -1,0 +1,13 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: chatapp-ingress
+  annotations:
+    cloud.google.com/backend-config: '{"default": "chatapp-be-config"}'
+    kubernetes.io/ingress.global-static-ip-name: 'server-ip-address'
+spec:
+  defaultBackend:
+    service:
+      name: 'server-service'
+      port:
+        number: 4000

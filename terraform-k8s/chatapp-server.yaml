@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-deployment
+  labels:
+    app: server
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: server
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: 'kubernetes.io/hostname'
+                labelSelector:
+                  matchLabels:
+                    app: server
+      containers:
+        - name: server
+          image: dejan1998/socketio-chat-app-server
+          ports:
+            - containerPort: 4000
+          env:
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: chatapp-configmap
+                  key: redis-url
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: chatapp-configmap
+                  key: redis-port
+            - name: COLLECTION_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: chatapp-configmap
+                  key: collection-name
+            - name: MONGODB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: chatapp-mongo-secret
+                  key: username
+            - name: MONGODB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: chatapp-mongo-secret
+                  key: password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: server
+  name: server-service
+spec:
+  type: ClusterIP
+  selector:
+    app: server
+  ports:
+  - port: 4000
+    protocol: TCP
+    targetPort: 4000

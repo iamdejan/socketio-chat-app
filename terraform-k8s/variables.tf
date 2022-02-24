@@ -1,5 +1,6 @@
 variable "project_id" {
   description = "GCP Project ID in which infrastructure will be provisioned."
+  default = "socket-io-chat-app-340411"
 }
 
 variable "network_name" {
@@ -11,11 +12,13 @@ variable "subnetwork_name" {
 }
 
 variable "region" {
-  default = "asia-southeast1"
+  description = "Region in which cluster will be created."
+  default = "us-west1"
 }
 
 variable "node_locations" {
-  default = "asia-southeast1-a,asia-southeast1-b,asia-southeast1-c"
+  description = "Zone in which K8s nodes will be located. Must be within specified region."
+  default = "us-west1-a,us-west1-b,us-west1-c"
 }
 
 variable "ip_range_pods_name" {
