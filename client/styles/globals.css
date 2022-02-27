@@ -7,7 +7,7 @@ body {
 }
 
 body {
-  background-image: url("/bg.jpg");
+  background-image: linear-gradient(rgb(255, 119, 244), rgb(98, 0, 255));
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
