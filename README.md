@@ -1,6 +1,11 @@
 # Socket.io Chat App with Next.js
 
-A simple chat app built with Next.js (for client) and Socket.io (for server).
+A chat application built with Next.js (for client) and Socket.io (for server), setup for Kubernetes engine.
+
+This project is featured in three-part series:
+- [Deploy Socket.io to Kubernetes - Part 0: Overview](https://blog.devgenius.io/deploy-socket-io-to-kubernetes-part-0-overview-f192428b48a4)
+- [Deploy Socket.io to Kubernetes - Part 1: Chat Application](https://blog.devgenius.io/deploy-socket-io-to-kubernetes-part-1-chat-application-f0824fed648a)
+- [Deploy Socket.io to Kubernetes - Part 2: Infrastructure](https://blog.devgenius.io/deploy-socket-io-to-kubernetes-part-2-infrastructure-7764fec252d0)
 
 ## Prerequisites
 - Application
